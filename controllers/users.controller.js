@@ -66,11 +66,11 @@ export async function getUserbyId(req, res,next) {
 }
 
 export async function patchUser(req, res,next) {
-  const newUser = req.body;
+ const newUser=req.body;
   // fetch old data
   try {
     const users = await getUsers();
-    const index = users.findIndex((u) => u.id === newUser.id);
+    const index = users.findIndex((u) => u.id === req.params.id);
     if(index===-1)
     {
       res.send("user not found");
@@ -78,9 +78,10 @@ export async function patchUser(req, res,next) {
     else
     {
       //patching according to json body
+      //again double check
       if(newUser.age!==undefined) users[index].age=newUser.age;
       if (newUser.name !== undefined) users[index].name = newUser.name;
-      if (newUser.id !== undefined) users[index].id = newUser.id;
+
 
 
     //save new data
@@ -104,14 +105,19 @@ export async function putUser(req, res,next ) {
   // fetch old data
   try {
     const users = await getUsers();
-    const index = users.findIndex((u) => u.id === newUser.id);
+    const index = users.findIndex((u) => u.id === req.params.id);
     if (index === -1) {
       res.send("user not found");
     } else {
       //patching according to json body
-      if(newUser.id!==undefined &&newUser.name!==undefined&&newUser.age!==undefined)
+      if(newUser.name!==undefined&&newUser.age!==undefined)
       {
-        users[index]=newUser;
+        users[index] = {
+          id: users[index].id, // keep ID
+          name: newUser.name, // required
+          age: newUser.age, // required
+          // only include what was sent — it's a replacement
+        };
         await saveUsers(users);
         res.json({ message: "user updated", newUser });
       }
@@ -132,26 +138,37 @@ export async function putUser(req, res,next ) {
 
 }
 
-export async function createUser(req, res,next ) {
-  const newUser=req.body;
-  // fetch old data
-  try{
+export async function createUser(req, res, next) {
+  try {
+    const newUser = req.body;
+
+    // Fetch existing users
     const users = await getUsers();
 
-    //add new data
-    users.push(newUser);
+    let newId;
 
+    if (users && users.length > 0) {
+      const lastUser = users[users.length - 1];
+      newId = Number(lastUser.id) + 1;
+    } else {
+      newId = 1;
+    }
 
-    //save new data
+    const userToAdd = {
+      id: String(newId),
+      name: newUser.name,
+      age: newUser.age,
+    };
+
+    // Add new user to the array
+    users.push(userToAdd);
+
+    // Save updated users
     await saveUsers(users);
-    res.json({ message: "user created", newUser });
-  }
-  catch(err)
-  {
+
+    res.status(201).json({ message: "User created", user: userToAdd });
+  } catch (err) {
     next(err);
   }
-
-
-
-
 }
+

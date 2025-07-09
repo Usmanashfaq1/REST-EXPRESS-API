@@ -2,6 +2,9 @@ import { getAllUsers,getUserbyId,deleteUserById,
   patchUser,putUser,createUser
  } from "../controllers/users.controller.js";
 
+ import { userBodyValidationRules,userParamRules } from "../validations/userValidator.js";
+ import { validate } from "../middlewares/validate.js";
+
 import { Router } from "express";
 const router=Router();
 
@@ -10,15 +13,15 @@ const router=Router();
 
 router.get("/",getAllUsers);
 
-router.get("/:id",getUserbyId);
+router.get("/:id",userParamRules,validate,getUserbyId);
 
-router.post("/",createUser);
+router.post("/", userBodyValidationRules, validate, createUser);
 
-router.put("/",putUser);
+router.put("/:id", userParamRules,userBodyValidationRules, validate, putUser);
 
-router.patch("/",patchUser);
+router.patch("/:id", userParamRules, userBodyValidationRules, patchUser);
 
-router.delete("/:id",deleteUserById);
+router.delete("/:id", userParamRules,validate,deleteUserById);
 
 
 
