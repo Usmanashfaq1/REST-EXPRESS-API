@@ -2,8 +2,10 @@ import express from "express"; //express frame work for api creation
 import dotenv from "dotenv/config";
 import morgan from "morgan";
 import { errorHandler } from "./middlewares/errorHandler.js"; //must add .js at end for custom modules
-import productRoutes from "./routes/products.routes.js";
-import userRoutes from "./routes/users.routes.js";
+
+
+import routeIndex from "./routes/index.js"; //importing base router (simple a middlware to handle routing)
+
 
 const app = express();
 const PORT = process.env.PORT;
@@ -17,13 +19,18 @@ app.use(morgan("dev"));
 
 // Middleware 2  to parse incoming JSON body  (convert json body into js obj)
 app.use(express.json());
+app.use("/api", routeIndex); // routes to index.js where its route futher to specfic routes
+
+
 
 
 // routes
 
-app.use("/api/users",userRoutes);
 
-app.use("/api/products", productRoutes);
+
+
+
+
 
 
 

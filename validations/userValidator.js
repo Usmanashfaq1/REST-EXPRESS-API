@@ -6,7 +6,6 @@ export const userBodyValidationRules = [
   body("age")
     .isInt({ min: 0, max: 99 })
     .withMessage("Age must be a valid number")
-
 ];
 
 export const patchUserValidationRules = [
