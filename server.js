@@ -1,47 +1,76 @@
-import express from "express"; //express frame work for api creation
+// ----- Global Crash Handlers -----
+process.on("unhandledRejection", (err) => {
+  console.error("❌ Unhandled Rejection:", err);
+  process.exit(1);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("❌ Uncaught Exception:", err);
+  process.exit(1);
+});
+
+
+// imports
+
+import express from "express";
 import dotenv from "dotenv/config";
 import morgan from "morgan";
-import { errorHandler } from "./middlewares/errorHandler.js"; //must add .js at end for custom modules
-
-
-import routeIndex from "./routes/index.js"; //importing base router (simple a middlware to handle routing)
-
+import { connectDB } from "./config/db.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import routeIndex from "./routes/index.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
 const app = express();
-const PORT = process.env.PORT;
+app.use(
+  cors({
+    origin: "http://localhost:5173", // ✅ must be explicit
+    credentials: true,
+  })
+); // allow everything
+const PORT = process.env.PORT || 5000;
 
-app.use((req, res, next) => {
-  console.log("hey you meet me again wow! okay now go to next door");
-  next(); // pass control to next middleware
-});
-//middleware 1  (To log incoming request)
+
+// --- MIDDLEWARES ---
+
+// 1. Log incoming HTTP requests
 app.use(morgan("dev"));
 
-// Middleware 2  to parse incoming JSON body  (convert json body into js obj)
+// 2. Parse incoming JSON requests
 app.use(express.json());
-app.use("/api", routeIndex); // routes to index.js where its route futher to specfic routes
 
+// parse cookies
+app.use(cookieParser());
 
-
-
-// routes
-
-
-
-
-
-
-
-
-
-
-// for error testing
-app.get("/Error", (req, res) => {
-  throw new Error("Fake crash");
+// 3. Custom middleware (for fun or debugging)
+app.use((req, res, next) => {
+  console.log("hey you meet me again wow! okay now go to next door");
+  next();
 });
 
-app.use(errorHandler); // general error handler middleware
+// --- ROUTES ---
+app.use("/api", routeIndex); // All API routes go through routeIndex
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// --- 404 Not Found Handler (Optional but good) ---
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Route not found" });
 });
+
+// --- GLOBAL ERROR HANDLER ---
+app.use(errorHandler);
+
+// --- START SERVER ---
+const startServer = async () => {
+  try {
+    await connectDB(); // Wait for MongoDB connection
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to connect to DB:", error.message);
+    process.exit(1); // Exit the app with failure code
+  }
+};
+
+startServer(); // Start the app

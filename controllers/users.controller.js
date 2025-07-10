@@ -4,7 +4,17 @@ export async function getAllUsers(req, res,next) {
   try {
    // throw new Error("🔥 Manual test error"); // ⛔️ force an error
     const users = await getUsers(); // ✅ wait for data
-    res.json(users); // ✅ send actual users
+    if(users.length>0)
+    {
+      // //sending a dummy cookie
+      // res.cookie("token", "abc123", { httpOnly: true, maxAge:5000 });
+      //max age 5 seconds
+      res.json(users); // ✅ send actual users
+    }
+    else{
+      res.send("no users exist!");
+    }
+
   } catch (err)
   {
     next(err); // sending it to global error handler
@@ -42,6 +52,7 @@ export async function deleteUserById(req, res,next) {
 
 export async function getUserbyId(req, res,next) {
   const userId=req.params.id;// getting user id
+  // console.log("received cookie : ",req.cookies);
 
   //reading user and deleting it
   try

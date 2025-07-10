@@ -1,7 +1,12 @@
 [
   {
     "id": "1",
-    "name": "Usman",
+    "name": "usman",
+    "age": "20"
+  },
+  {
+    "id": "2",
+    "name": "Ahmad",
     "age": "20"
   }
 ]
