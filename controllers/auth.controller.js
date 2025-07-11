@@ -60,7 +60,12 @@ export   async function loginUser(req,res,next) {
 }
 export function logoutUser(req, res, next)
  {
-  res.cookie('jwt','',{maxAge:1});
+  //using res.clear cookie
+ res.clearCookie("jwt", {
+   httpOnly: true,
+   secure: true,
+   sameSite: "none",
+ });
   res.status(200).json({message:"logout successfull!"});
  }
 
