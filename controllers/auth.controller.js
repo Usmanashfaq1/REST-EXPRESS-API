@@ -25,7 +25,35 @@ export const createUser = async (req, res, next) => {
   }
 };
 
-export function logout(req, res, next) {}
+// making controller function to use user model login function
+export   async function loginUser(req,res,next) {
+  const {email,password}=req.body;
+  try
+  {
+     const user=await User.login(email,password);
+     // sending json cookie
+     const token = createToken(user._id);
+     res.cookie("jwt", token, {
+       httpOnly: true,
+       maxAge: maxAge[0] * 24 * 60 * 60 * 1000,
+     });
+
+     res.status(200).json({message :"login successfull",user: user._id});//sending response 200 and user id
+
+  }
+  catch(err)
+  {
+    next(err);
+
+  }
+
+
+}
+export function logoutUser(req, res, next)
+ {
+  res.cookie('jwt','',{maxAge:1});
+  res.status(200).json({message:"logout successfull!"});
+ }
 
 
 
