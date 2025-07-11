@@ -11,7 +11,13 @@ export const createUser = async (req, res, next) => {
   try {
     const savedUser = await User.create(req.body);
     const token=createToken(savedUser._id);
-    res.cookie("jwt",token, { httpOnly:true, maxAge:maxAge[0]*24*60*60*1000});
+   res.cookie("jwt", token, {
+     httpOnly: true,
+     secure: true, // ✅ Required for HTTPS (Netlify + Railway)
+     sameSite: "none", // ✅ Required for cross-origin
+     maxAge: maxAge[0] * 24 * 60 * 60 * 1000,
+   });
+
 
     res.status(201).json({
       message: "User created",
@@ -35,8 +41,11 @@ export   async function loginUser(req,res,next) {
      const token = createToken(user._id);
      res.cookie("jwt", token, {
        httpOnly: true,
+       secure: true, // ✅ Required for HTTPS (Netlify + Railway)
+       sameSite: "none", // ✅ Required for cross-origin
        maxAge: maxAge[0] * 24 * 60 * 60 * 1000,
      });
+
 
      res.status(200).json({message :"login successfull",user: user._id});//sending response 200 and user id
 
