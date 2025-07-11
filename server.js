@@ -24,7 +24,10 @@ import cors from "cors";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // ✅ must be explicit
+    origin: [
+      "http://localhost:5173", // for local dev
+      "https://crypto-coin-price-track.netlify.app", // your deployed frontend
+    ],
     credentials: true,
   })
 ); // allow everything
