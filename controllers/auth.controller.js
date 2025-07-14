@@ -139,23 +139,23 @@ export function logoutUser(req, res, next)
 
 export const resetPassword = async (req, res,next) => {
   //object destructing concept
-  const { token } = req.params;
+  const { token } = req.params; //getting raw token
   const { password } = req.body;
 
   try{
 
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
   const user = await User.findOne({
-    resetToken: hashedToken,
-    resetTokenExpires: { $gt: Date.now() }
-  });
+  resetPasswordToken: hashedToken,    // ✅ Correct field name
+  resetPasswordExpires: { $gt: Date.now() },
+});
 
   if (!user) return res.status(400).json({ message: "Token invalid or expired" });
 
   // Set new password
     user.password = password;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
+user.resetPasswordToken = undefined;
+user.resetPasswordExpires = undefined;
   // here setting stuff to schema
   //pre gonna call before saving
   await user.save();
