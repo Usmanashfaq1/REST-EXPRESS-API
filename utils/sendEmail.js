@@ -3,8 +3,8 @@ import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "usmanx458@gmail.com",
-    pass: "xhtp bmpf ovcb bbfa",
+    user: `${process.env.EMAIL}`,
+    pass: `${process.env.PASS}`,
   },
 });
 
@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 const sendRecoveryLink = async ({ to, subject, text }) => {
   try{
     const info = await transporter.sendMail({
-    from: `"Password Reset Link - CPT" <usmanx458@gmail.com>`,
+    from: `"Password Reset Link - CPT" <${process.env.EMAIL}>`,
     to,
     subject,
     text,
