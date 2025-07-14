@@ -152,9 +152,10 @@ export const resetPassword = async (req, res,next) => {
 
   if (!user) return res.status(400).json({ message: "Token invalid or expired" });
 
-  user.password = password;
-  user.resetToken = undefined;
-  user.resetTokenExpires = undefined;
+  // Set new password
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
   // here setting stuff to schema
   //pre gonna call before saving
   await user.save();

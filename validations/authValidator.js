@@ -20,8 +20,4 @@ export const passwordTokenValidator = [
  body("password")
   .notEmpty().withMessage("Password is required")
   .isLength({ min: 6 }).withMessage("Password too short"),
-
-   body("token")
-    .notEmpty().withMessage("Token is required"),
-
 ];

@@ -22,7 +22,7 @@ router.post("/logout",logoutUser);
 
 router.post("/forgot-password",emailValidator,validate,forgotPassword);
 
-router.post("/reset-password",passwordTokenValidator,validate,resetPassword);
+router.post("/reset-password/:token",passwordTokenValidator,validate,resetPassword);
 
 
 
