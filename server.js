@@ -1,3 +1,5 @@
+
+
 // ----- Global Crash Handlers -----
 process.on("unhandledRejection", (err) => {
   console.error("❌ Unhandled Rejection:", err);
@@ -10,10 +12,12 @@ process.on("uncaughtException", (err) => {
 });
 
 
-// imports
+// imports are hoisted at top and execute before anyother code
 
+// imports
+import "./config/loadEnv.js";
+// highest priorty
 import express from "express";
-import dotenv from "dotenv/config";
 import morgan from "morgan";
 import { connectDB } from "./config/db.js";
 import { errorHandler } from "./middlewares/errorHandler.js";

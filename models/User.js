@@ -6,14 +6,22 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Please enter email"],
-    unique: [true, "Please email must  be unique"],
+    unique: [true, "Email must be unique"],
     lowercase: true,
-    validate : [isEmail,"please enter a valid email address"]
+    validate: [isEmail, "Please enter a valid email address"],
   },
   password: {
     type: String,
-    required: [true,"Please enter password"],
-    minLength: [6,"minimum length should be 6 charactes"]
+    required: [true, "Please enter password"],
+    minLength: [6, "Minimum length should be 6 characters"],
+  },
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null,
   },
 });
 
@@ -29,6 +37,8 @@ userSchema.post('save',function(doc,next)
 
 //fire a function befor doc saved to db
 userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next(); // ✅ Prevent double hashing
+  //checking if password acutally change or not
   const salt = await bcrypt.genSalt();
 
   console.log("user before going in db!", this);

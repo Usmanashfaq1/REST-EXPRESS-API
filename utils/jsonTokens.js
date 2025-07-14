@@ -1,4 +1,4 @@
-import dotenv from "dotenv/config";
+
 import jwt from "jsonwebtoken";
 
 export const maxAge=process.env.MAX_AGE;

@@ -1,8 +1,8 @@
 import { Router } from "express";
 
 import { validate } from "../middlewares/validate.js";
-import { signupValidator,loginValidator } from "../validations/authValidator.js";
-import { createUser,loginUser,logoutUser} from "../controllers/auth.controller.js";
+import { signupValidator,loginValidator,passwordTokenValidator,emailValidator } from "../validations/authValidator.js";
+import { createUser,loginUser,logoutUser,resetPassword,forgotPassword} from "../controllers/auth.controller.js";
 
 const router=Router();
 
@@ -18,6 +18,11 @@ router.post("/signup",signupValidator,validate,createUser);
 // Logging out is a side effect, so it should be POST
 //log out user
 router.post("/logout",logoutUser);
+
+
+router.post("/forgot-password",emailValidator,validate,forgotPassword);
+
+router.post("/reset-password",passwordTokenValidator,validate,resetPassword);
 
 
 

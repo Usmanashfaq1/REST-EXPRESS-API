@@ -2,6 +2,10 @@
 import User from "../models/User.js";
 import {createToken,maxAge} from "../utils/jsonTokens.js";
 
+import sendRecoveryLink from "../utils/sendEmail.js";
+import generateRestToken from "../utils/generateToken.js";
+
+
 
 export function login(req, res, next) {}
 
@@ -68,6 +72,104 @@ export function logoutUser(req, res, next)
  });
   res.status(200).json({message:"logout successfull!"});
  }
+
+
+ 
+ export const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+  const origin = req.headers.origin || "http://localhost:5173";
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({
+        message: "If an account with that email exists, a reset link has been sent.",
+      });
+    }
+
+    // ⛔️ Check throttling BEFORE generating and saving token
+    if (
+      user.resetPasswordToken &&
+      user.resetPasswordExpires > Date.now()
+    ) {
+      return res.status(429).json({
+        message: "A reset link was already sent recently. Please check your email.",
+      });
+    }
+
+    // ✅ Generate and save new token
+    const tokens = generateRestToken();
+    const expiration = Date.now() + 15 * 60 * 1000;
+
+    await User.updateOne(
+      { _id: user._id },
+      {
+        resetPasswordToken: tokens.hashedToken,
+        resetPasswordExpires: expiration,
+      }
+    );
+
+    const resetUrl = `${origin}/reset-password/${tokens.resetToken}`;
+    const message = `Click the link to reset your password:\n\n${resetUrl}\n\nThis link expires in 15 minutes.`;
+
+    await sendRecoveryLink({
+      to: user.email,
+      subject: "Password Reset",
+      text: message,
+    });
+
+    return res.status(200).json({
+      message: "If an account with that email exists, a reset link has been sent.",
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
+ 
+
+
+
+
+
+export const resetPassword = async (req, res) => {
+  //object destructing concept
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try{
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  const user = await User.findOne({
+    resetToken: hashedToken,
+    resetTokenExpires: { $gt: Date.now() }
+  });
+
+  if (!user) return res.status(400).json({ message: "Token invalid or expired" });
+
+  user.password = password;
+  user.resetToken = undefined;
+  user.resetTokenExpires = undefined;
+  // here setting stuff to schema
+  //pre gonna call before saving
+  await user.save();
+
+  res.status(200).json({ message: "Password updated" });
+
+  }
+
+  catch(err)
+  {
+    next(err);
+  }
+
+  
+};
+
 
 
 

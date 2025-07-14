@@ -17,6 +17,18 @@ router.get("/profile",  (req, res) => {
   res.status(200).json(req.user); // req.user comes from the decoded JWT
 });
 
+//forget password
+
+
+// router.post("/forgot-password");
+
+// router.post("/reset-password");
+
+// router.post("/verify-email");
+
+
+
+
 router.get("/",getAllUsers);
 
 router.get("/:id",userParamRules,validate,getUserbyId);
