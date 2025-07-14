@@ -136,7 +136,7 @@ export function logoutUser(req, res, next)
 
 
 
-export const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res,next) => {
   //object destructing concept
   const { token } = req.params;
   const { password } = req.body;
